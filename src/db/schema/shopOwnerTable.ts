@@ -8,10 +8,12 @@ export const shopOwnerTable = mysqlTable(
   {
     shopId: int()
       .notNull()
-      .references(() => shopsTable.id),
+      .references(() => shopsTable.id)
+      .notNull(),
     ownerId: int()
       .notNull()
-      .references(() => ownersTable.id),
+      .references(() => ownersTable.id)
+      .notNull(),
   },
   (t) => [primaryKey({ columns: [t.shopId, t.ownerId] })]
 );

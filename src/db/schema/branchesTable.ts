@@ -3,10 +3,11 @@ import { shopsTable } from "./shopsTable";
 import { relations } from "drizzle-orm";
 export const branchesTable = mysqlTable("branches", {
   id: int().autoincrement().notNull().primaryKey(),
-  name: varchar({ length: 50 }),
+  name: varchar({ length: 50 }).notNull(),
   shopId: int()
     .notNull()
-    .references(() => shopsTable.id),
+    .references(() => shopsTable.id)
+    .notNull(),
 });
 
 export const branchRelations = relations(branchesTable, ({ one }) => ({

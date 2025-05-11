@@ -17,16 +17,20 @@ export const employeesTable = mysqlTable("employees", {
   email: text().notNull(),
   position: varchar({ length: 20 }),
   gender: mysqlEnum(["male", "female", "other"]).default("female"),
-  phoneNumber: varchar({ length: 11 }),
+  phoneNumber: varchar({ length: 11 }).notNull(),
   dateEmploy: date(),
   address1: varchar({ length: 255 }),
   address2: varchar({ length: 255 }),
   address3: varchar({ length: 255 }),
   avatar: varchar({ length: 255 }),
   salary: int().notNull(),
-  bankName: text(),
-  bankAccount: text(),
-  bankAccountNumber: text(),
-  shopId: int().references(() => shopsTable.id),
-  branchId: int().references(() => branchesTable.id),
+  bankName: text().notNull(),
+  bankAccount: text().notNull(),
+  bankAccountNumber: text().notNull(),
+  shopId: int()
+    .references(() => shopsTable.id)
+    .notNull(),
+  branchId: int()
+    .references(() => branchesTable.id)
+    .notNull(),
 });
