@@ -18,7 +18,8 @@
     "jose": "^6.0.11",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
-    "next-auth": "^4.24.11"
+    "next-auth": "^4.24.11",
+    "slugify": "^1.6.6"
   },
   "devDependencies": {
     "bun-types": "latest",

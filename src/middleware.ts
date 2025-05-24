@@ -1,28 +1,40 @@
 import { except } from "drizzle-orm/gel-core";
-import Elysia, { status } from "elysia";
+import Elysia, { Cookie, status } from "elysia";
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { JWT } from "next-auth/jwt";
+import { JWTPayload } from "../types/JWTPayload";
 
-const JWKS = createRemoteJWKSet(
-  new URL("https://www.googleapis.com/oauth2/v3/certs")
-);
+interface middlewareProps {
+  user: JWTPayload | undefined;
+  session_token: string | undefined;
+  request: Request;
+  jwt: any;
+  cookie: Record<string, Cookie<string | undefined>>;
+}
 
-export const middleware = async ({ request, set, jwt }) => {
-  const token = request.headers.get("authorization")?.split(" ")[1];
-  if (!token) {
-    console.log("Unauthorized");
+export const middleware = async ({
+  user,
+  session_token,
+  request,
+  jwt,
+  cookie,
+}: middlewareProps) => {
+  const log = (message: string) => {
+    console.log(
+      `[${new Date().toISOString()}] ${request.method} ${
+        request.url
+      } ${message}`
+    );
+  };
 
-    return status("Unauthorized", { error: "Authorization token missing" });
-  }
-
-  try {
-    const { payload } = await jwtVerify(token!, JWKS, {
-      issuer: "https://accounts.google.com",
-      audience:
-        "648145207628-juo34r0b5akic3mq7osh38fujvl8u35k.apps.googleusercontent.com", // your Google client ID
+  log("🔄 Request received at middleware");
+  if (!session_token || !user) {
+    log("⛔ Unauthorized: Missing session token");
+    return status("Unauthorized", {
+      error: "Authorization token missing or expried",
     });
-  } catch (e) {
-    console.log(e);
   }
 
-  console.log("succsess");
+  log("✅ Authentication successful");
+  return;
 };

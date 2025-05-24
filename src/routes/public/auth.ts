@@ -11,24 +11,20 @@ const auth = new Elysia({ prefix: "/auth" })
       secret: process.env.ELYSIA_JWT_SECRET!,
     })
   )
-  .get("/test", () => {
-    return { message: "kuy" };
-  })
   .post(
     "/verify",
     async ({ body, jwt }) => {
-      const user = await db
-        .select()
-        .from(ownersTable)
-        .where(eq(ownersTable.email, body.email));
+      const user = await db.query.ownersTable.findFirst({
+        where: (ownersTable, { eq }) => eq(ownersTable.email, body.email),
+      });
 
-      if (user.length === 0) {
+      if (!user) {
         return status("Unauthorized", { verify: false });
       }
-      return status("OK", { verify: true });
+      return status("OK", { verify: true, user });
     },
     {
-      body: t.Object({ email: t.String() }),
+      body: t.Object({ email: t.String({ format: "email" }) }),
     }
   );
 

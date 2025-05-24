@@ -9,7 +9,7 @@ import { otDetailsTable } from "./otDetailsTable";
 
 export const shopsTable = mysqlTable("shops", {
   id: int().autoincrement().notNull().primaryKey(),
-  name: varchar({ length: 50 }).notNull(),
+  name: varchar({ length: 50 }).notNull().unique(),
   avatar: varchar({ length: 255 }),
 });
 

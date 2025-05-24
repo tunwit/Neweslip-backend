@@ -1,6 +1,5 @@
 import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
-import user from "./routes/protected/user";
 import jwt from "@elysiajs/jwt";
 import protected_route from "./routes/protected/protected";
 import public_route from "./routes/public/public";
@@ -19,6 +18,11 @@ const app = new Elysia({
   .use(swagger())
   .use(protected_route)
   .use(public_route)
+  .onError(({ code, error }) => {
+    console.log(error);
+
+    return new Response(error.toString());
+  })
   .get("/", () => "Hello Elysia")
   .listen(process.env.ELYSIA_PORT || 3000);
 
