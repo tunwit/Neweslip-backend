@@ -91,13 +91,14 @@ const employees = new Elysia({ prefix: "/employees" })
         });
       }
 
-      const branch = query.branchId;
+      const branchId = query.branchId;
       const _status = query.status;
       const search = query.search_query ? query.search_query : "";
       const page = query.page ? Number(query.page) : 1;
       const limit = query.limit ? Number(query.limit) : 10;
       const offset = (page - 1) * limit;
 
+      const shopFilter = eq(employeesTable.shopId, Number(shopId));
       const trimmedSearch = search.trim();
       const searchFilter = trimmedSearch
         ? or(
@@ -109,11 +110,16 @@ const employees = new Elysia({ prefix: "/employees" })
           )
         : undefined;
 
+      const branchFilter = eq(employeesTable.branchId, branchId);
+      const statusFilter = eq(employeesTable.status, _status);
+
       const employees = await db.query.employeesTable.findMany({
         where: (employeesTable, { eq }) =>
           and(
-            eq(employeesTable.shopId, Number(shopId)),
-            ...(searchFilter ? [searchFilter] : [])
+            shopFilter,
+            ...(searchFilter ? [searchFilter] : []),
+            ...(branchId ? [branchFilter] : []),
+            ...(_status ? [statusFilter] : [])
           ),
 
         with: {
@@ -123,8 +129,17 @@ const employees = new Elysia({ prefix: "/employees" })
         offset: offset,
       });
 
-      const total = await db.select({ count: count() }).from(employeesTable);
-      console.log(total);
+      const total = await db
+        .select({ count: count() })
+        .from(employeesTable)
+        .where(
+          and(
+            shopFilter,
+            ...(searchFilter ? [searchFilter] : []),
+            ...(branchId ? [branchFilter] : []),
+            ...(_status ? [statusFilter] : [])
+          )
+        );
 
       return status("OK", {
         employees,
